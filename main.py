@@ -2,18 +2,35 @@
 import cv2 as cv 
 import numpy as np 
 import matplotlib.pyplot as plt 
-from tensorflow import datasets, layers, models
+import tensorflow as tf
+import tensorflow_datasets as tfds
 
-(training_images, training_labels), (testing_images, testing_labels) = datasets.cifar10.load_data()
-training_images, testing_images = training_images / 255, testing_images / 255
+# Load the dataset
+# Fetch the CIFAR-10 dataset
+(training_data, testing_data) = tfds.load(
+    'cifar10',
+    split=['train', 'test'],
+    as_supervised=True
+)
 
+# Normalize the data
+def normalize(image, label):
+    image = tf.cast(image, tf.float32) / 255.0
+    return image, label
+
+training_data = training_data.map(normalize)
+testing_data = testing_data.map(normalize)
+
+# Define the class names
 class_names = ['Plane', 'Car', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
-for i in range(16):
-    plt.subplot(4,4,i+1)
+# Display 16 Images from the training dataset
+plt.figure(figsize=(10, 10))
+for i, (image, label) in enumerate(training_data.take(16)):
+    plt.subplot(4, 4, i+1)
+    plt.imshow(image.numpy())
     plt.xticks([])
     plt.yticks([])
-    plt.imshow(training_images[i], cmap=plt.cm.binary)
-    plt.xlabel(class_names[training_labels[i][0]])
+    plt.xlabel(class_names[label.numpy()])
 
 plt.show()
