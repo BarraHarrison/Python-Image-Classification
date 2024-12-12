@@ -3,6 +3,7 @@ import cv2 as cv
 import numpy as np 
 import matplotlib.pyplot as plt 
 import tensorflow as tf
+from keras import layers, models
 import tensorflow_datasets as tfds
 
 # Load the dataset
@@ -34,3 +35,20 @@ for i, (image, label) in enumerate(training_data.take(16)):
     plt.xlabel(class_names[label.numpy()])
 
 plt.show()
+
+# Building and Training the Model
+model = models.Sequential([
+    layers.Conv2D(32, (3,3), activation='relu', input_shape=(32, 32, 3)),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64, (3,3), activation='relu'),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64, (3,3), activation='relu'),
+    layers.Flatten(),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Train the Model
+history = model.fit(training_data, epochs=10, validation_data=testing_data)
