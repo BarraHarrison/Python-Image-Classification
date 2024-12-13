@@ -19,8 +19,8 @@ def normalize(image, label):
     image = tf.cast(image, tf.float32) / 255.0
     return image, label
 
-training_data = training_data.map(normalize)
-testing_data = testing_data.map(normalize)
+training_data = training_data.map(normalize).cache().shuffle(5000).batch(32).prefetch(tf.data.AUTOTUNE)
+testing_data = testing_data.map(normalize).batch(32).prefetch(tf.data.AUTOTUNE)
 
 # Define the class names
 class_names = ['Plane', 'Car', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
@@ -38,7 +38,8 @@ class_names = ['Plane', 'Car', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'S
 
 # Building and Training the Model
 model = models.Sequential([
-    layers.Conv2D(32, (3,3), activation='relu', input_shape=(32, 32, 3)),
+    layers.Input(shape=(32, 32, 3)),
+    layers.Conv2D(32, (3,3), activation='relu'),
     layers.MaxPooling2D((2,2)),
     layers.Conv2D(64, (3,3), activation='relu'),
     layers.MaxPooling2D((2,2)),
