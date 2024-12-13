@@ -26,15 +26,15 @@ testing_data = testing_data.map(normalize)
 class_names = ['Plane', 'Car', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
 # Display 16 Images from the training dataset
-plt.figure(figsize=(10, 10))
-for i, (image, label) in enumerate(training_data.take(16)):
-    plt.subplot(4, 4, i+1)
-    plt.imshow(image.numpy())
-    plt.xticks([])
-    plt.yticks([])
-    plt.xlabel(class_names[label.numpy()])
+# plt.figure(figsize=(10, 10))
+# for i, (image, label) in enumerate(training_data.take(16)):
+#     plt.subplot(4, 4, i+1)
+#     plt.imshow(image.numpy())
+#     plt.xticks([])
+#     plt.yticks([])
+#     plt.xlabel(class_names[label.numpy()])
 
-plt.show()
+# plt.show()
 
 # Building and Training the Model
 model = models.Sequential([
@@ -52,3 +52,19 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 
 # Train the Model
 history = model.fit(training_data, epochs=10, validation_data=testing_data)
+
+
+loss, accuracy = model.evaluate(testing_data)
+print(f"loss: {loss}")
+print(f"accuracy: {accuracy}")
+
+model.save('image_classifier.model')
+model = models.load_model()
+
+img = cv.imread('car_image.avif')
+img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+
+plt.imshow(img, cmap=plt.cm.binary)
+prediction = model.predict(np.array([img]) / 255)
+index = np.argmax(prediction)
+print(f'Prediction is {class_names[index]}')
