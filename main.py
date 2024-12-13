@@ -60,7 +60,7 @@ print(f"loss: {loss}")
 print(f"accuracy: {accuracy}")
 
 # Save and Load the Model
-model.save('image_classifier.model')
+model.save('image_classifier.keras')
 model = models.load_model('image_classifier.model')
 
 # Load and Prepare the Image
