@@ -53,18 +53,26 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 # Train the Model
 history = model.fit(training_data, epochs=10, validation_data=testing_data)
 
-
-loss, accuracy = model.evaluate(testing_data)
+# Evaluate the Model
+loss, accuracy = model.evaluate(testing_data, batch_size=32)
 print(f"loss: {loss}")
 print(f"accuracy: {accuracy}")
 
+# Save and Load the Model
 model.save('image_classifier.model')
-model = models.load_model()
+model = models.load_model('image_classifier.model')
 
+# Load and Prepare the Image
 img = cv.imread('car_image.avif')
 img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+img = cv.resize(img, (32, 32))
+img = np.array([img]) / 255.0
 
-plt.imshow(img, cmap=plt.cm.binary)
-prediction = model.predict(np.array([img]) / 255)
+# Display the Image
+plt.imshow(img[0])
+plt.show()
+
+# Make the Prediction
+prediction = model.predict(img)
 index = np.argmax(prediction)
 print(f'Prediction is {class_names[index]}')
